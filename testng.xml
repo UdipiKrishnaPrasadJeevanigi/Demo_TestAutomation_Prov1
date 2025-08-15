@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="C:/Users/judip/IdeaProjects/MavenProv1/src/test/java/org/example">
+        <classes>
+            <class name="org.example.AppTest">
+                <methods>
+                    <include name="testUserLogin"/><include name="testUserLoginFailure"/>
+                </methods>
+            </class>
+            <class name="org.example.TC_LoginTest">
+                <methods>
+                    <include name="userLoginTest"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
