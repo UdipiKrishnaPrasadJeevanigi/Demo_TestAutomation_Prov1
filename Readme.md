@@ -20,3 +20,39 @@
 -  The testng dependency is used for integration testing.
 -  The selenium-java dependency is used for browser automation testing.
 -  The `log4j` dependency is used for logging.
+
+
+# Jenkins Integration
+- Groovy code
+`  pipeline {
+  agent any
+  tools {
+  maven  "maven-3.9"
+  }
+  stages {
+  stage("Clean Up"){
+  steps {
+  deleteDir()
+  }
+  }
+  stage("Clone Repo"){
+  steps {
+  sh "git clone https://github.com/jenkins-docs/simple-java-maven-app.git"
+  }
+  }
+  stage("Build"){
+  steps {
+  dir("simple-java-maven-app") {
+  sh "mvn clean install"
+  }
+  }
+  }
+  stage("Test"){
+  steps {
+  dir("simple-java-maven-app") {
+  sh "mvn test"
+  }
+  }
+  }
+  }
+  }'`
