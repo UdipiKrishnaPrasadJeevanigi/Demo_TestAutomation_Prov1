@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/test/java/org/example/TC_LoginTest.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/test/java/org/example/TC_LoginTest.java" />
+              <option name="originalContent" value="package org.example;&#10;&#10;import org.testng.Assert;&#10;import org.testng.annotations.Test;&#10;&#10;public class TC_LoginTest {&#10;    @Test&#10;    public void userLoginTest() {&#10;        // Simple test that doesn't require browser&#10;        App app = new App();&#10;        int result = app.userLogin(&quot;udipikrishna&quot;, &quot;udipi@200136&quot;);&#10;        Assert.assertEquals(result, 1, &quot;Login should be successful with correct credentials&quot;);&#10;    }&#10;&#10;    @Test&#10;    public void userLoginFailTest() {&#10;        App app = new App();&#10;        int result = app.userLogin(&quot;wrong&quot;, &quot;wrong&quot;);&#10;        Assert.assertEquals(result, 0, &quot;Login should fail with incorrect credentials&quot;);&#10;    }&#10;}&#10;" />
+              <option name="updatedContent" value="package org.example;&#10;&#10;import io.github.bonigarcia.wdm.WebDriverManager;&#10;import org.openqa.selenium.WebDriver;&#10;import org.openqa.selenium.chrome.ChromeDriver;&#10;import org.openqa.selenium.chrome.ChromeOptions;&#10;import org.testng.Assert;&#10;import org.testng.annotations.AfterTest;&#10;import org.testng.annotations.BeforeTest;&#10;import org.testng.annotations.Test;&#10;&#10;public class TC_LoginTest {&#10;    private WebDriver driver;&#10;&#10;    @BeforeTest&#10;    public void setup() {&#10;        ChromeOptions options = new ChromeOptions();&#10;        options.addArguments(&quot;--headless&quot;);&#10;        options.addArguments(&quot;--no-sandbox&quot;);&#10;        options.addArguments(&quot;--disable-dev-shm-usage&quot;);&#10;        options.addArguments(&quot;--disable-gpu&quot;);&#10;        options.addArguments(&quot;--window-size=1920,1080&quot;);&#10;        &#10;        driver = new ChromeDriver(options);&#10;    }&#10;&#10;    @Test&#10;    public void testAppLogin() {&#10;        // Test the App class login functionality&#10;        App app = new App();&#10;        int result = app.userLogin(&quot;udipikrishna&quot;, &quot;udipi@200136&quot;);&#10;        Assert.assertEquals(result, 1, &quot;Login should be successful with correct credentials&quot;);&#10;    }&#10;&#10;    @Test&#10;    public void testBrowserNavigation() {&#10;        driver.get(&quot;https://www.google.com&quot;);&#10;        Assert.assertTrue(driver.getTitle().contains(&quot;Google&quot;), &quot;Should be able to navigate to Google&quot;);&#10;    }&#10;&#10;    @AfterTest&#10;    public void tearDown() {&#10;        if (driver != null) {&#10;            driver.quit();&#10;        }&#10;    }&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
