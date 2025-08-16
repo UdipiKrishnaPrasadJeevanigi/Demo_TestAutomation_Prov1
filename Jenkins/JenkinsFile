@@ -16,6 +16,44 @@ pipeline {
             }
         }
 
+        stage('Setup Chrome and ChromeDriver') {
+            steps {
+                sh '''
+                    # Run with root privileges in Docker
+                    [ "$(id -u)" != "0" ] && exec sudo -u root "$0" "$@"
+
+                    # Update package list and install required dependencies
+                    apt-get update
+                    apt-get install -y wget gnupg2 curl unzip
+                    apt-get install -y libnss3 libgbm1 libasound2
+
+                    # Add Google Chrome repository and key
+                    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list
+
+                    # Install Google Chrome
+                    apt-get update
+                    apt-get install -y google-chrome-stable
+
+                    # Install ChromeDriver
+                    CHROME_VERSION=$(google-chrome --version | cut -d " " -f3 | cut -d "." -f1)
+                    CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+                    wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+                    unzip -q chromedriver_linux64.zip
+                    mv chromedriver /usr/local/bin/
+                    chmod +x /usr/local/bin/chromedriver
+
+                    # Create chrome user and set permissions
+                    groupadd -r chrome && useradd -r -g chrome -G audio,video chrome
+                    mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
+
+                    # Verify installations
+                    google-chrome --version
+                    chromedriver --version
+                '''
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'mvn -B clean compile'
@@ -24,7 +62,13 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh '''
+                    # Set display for Chrome
+                    export DISPLAY=:99
+
+                    # Run tests
+                    mvn -B test
+                '''
             }
             post {
                 always {
@@ -41,6 +85,12 @@ pipeline {
     }
 
     post {
+        success {
+            echo 'Build and tests completed successfully!'
+        }
+        failure {
+            echo 'Build or tests failed!'
+        }
         always {
             cleanWs()
         }
