@@ -1,8 +1,9 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'maven-3.9'
+    agent {
+        docker {
+            image 'maven:3.9-amazoncorretto-17'
+            args '-v /var/run/docker.sock:/var/run/docker.sock --privileged'
+        }
     }
 
     options {
@@ -10,26 +11,17 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Setup Chrome and ChromeDriver') {
             steps {
                 sh '''
-                    # Run with root privileges in Docker
-                    [ "$(id -u)" != "0" ] && exec sudo -u root "$0" "$@"
-
                     # Update package list and install required dependencies
                     apt-get update
                     apt-get install -y wget gnupg2 curl unzip
                     apt-get install -y libnss3 libgbm1 libasound2
 
-                    # Add Google Chrome repository and key
-                    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list
+                    # Add Google Chrome repository
+                    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+                    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 
                     # Install Google Chrome
                     apt-get update
@@ -42,14 +34,6 @@ pipeline {
                     unzip -q chromedriver_linux64.zip
                     mv chromedriver /usr/local/bin/
                     chmod +x /usr/local/bin/chromedriver
-
-                    # Create chrome user and set permissions
-                    groupadd -r chrome && useradd -r -g chrome -G audio,video chrome
-                    mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
-
-                    # Verify installations
-                    google-chrome --version
-                    chromedriver --version
                 '''
             }
         }
